@@ -124,7 +124,7 @@ export default function LoveQuiz() {
           {showImage && (
             <div className="surprise-fullscreen">
               {/* FIXED: Direct path to public folder */}
-              <img src="/images/15.jpg" alt="Surprise" />
+              <img src="/images/1.jpg" alt="Surprise" />
             </div>
           )}
 

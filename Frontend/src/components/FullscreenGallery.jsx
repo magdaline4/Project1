@@ -14,7 +14,7 @@ export default function FullscreenGallery() {
   useEffect(() => {
     const interval = setInterval(() => {
       const newHeart = {
-        id: Date.now(),
+        id: Date.now(),  
         left: Math.random() * 100, // horizontal position %
         size: 10 + Math.random() * 20, // size px
         duration: 4 + Math.random() * 3 // float duration in seconds
