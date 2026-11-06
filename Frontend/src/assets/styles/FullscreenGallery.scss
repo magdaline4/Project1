@@ -151,6 +151,11 @@ html, body, #root {
   object-position: center;
   display: block;
 }
+
+.photo{
+  padding: 12px;
+  border-radius: 20px;
+}
 @keyframes slideIn {
   from {
     opacity: 0;
