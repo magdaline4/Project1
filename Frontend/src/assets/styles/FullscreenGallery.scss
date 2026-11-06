@@ -107,43 +107,48 @@
     opacity: 0;
   }
 }
-// Phone-only layout: one photo at a time
-.photo-gallery.is-mobile {
-  grid-template-columns: 1fr;
-  width: 100%;
+html, body, #root {
+  margin: 0;
   padding: 0;
-  place-items: center;
+  width: 100%;
+}
 
-  .photo-wrapper:hover {
-    transform: none; // no sticky hover on touch
-  }
+// Phone-only layout: one photo at a time, no gaps
+.photo-gallery.is-mobile {
+  display: block;
+  width: 100%;
+  height: 100dvh;   // same unit as the slider below
+  min-height: 0;    // <-- kills the 100vh extra space
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .photo-slider {
-  grid-column: 1 / -1;
   width: 100%;
-  height: 100vh;
-  height: 100dvh; // accounts for phone browser bars
-  padding: 12px;
-  margin-top: -10px;
-  box-sizing: border-box;
+  height: 100%;
+  margin: 0;
+  padding: 0;       // 0 = full bleed; use 12px if you want the side gaps
   display: flex;
   align-items: center;
   justify-content: center;
-
-  .photo-wrapper {
-    width: 100%;
-    height: 100%;
-    border-radius: 20px;
-    animation: slideIn 0.6s ease;
-  }
-
-  .photo {
-    height: 100%;
-    object-fit: cover; // use "contain" if you want the whole photo visible
-  }
 }
 
+.photo-slider .photo-wrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: 0; // 20px if you keep the side padding
+  overflow: hidden;
+  animation: slideIn 0.6s ease;
+}
+
+.photo-slider .photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
 @keyframes slideIn {
   from {
     opacity: 0;
