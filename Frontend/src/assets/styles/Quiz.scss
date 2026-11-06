@@ -140,3 +140,37 @@
   font-weight: bold;
   font-size: 22px;
 }
+
+// Phone: make the message (flip) card fill the screen width
+@media (max-width: 480px) {
+  .flip-card {
+    width: calc(100vw - 32px); // full width minus side margins
+    max-width: 360px;
+    height: 200px;             // slightly shorter so it fits under the notch
+  }
+
+  .flip-front,
+  .flip-back {
+    box-sizing: border-box;    // <-- key: padding no longer adds to width
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .flip-front {
+    font-size: 42px;
+  }
+
+  .flip-back {
+    font-size: 20px;
+    line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+}
+.flip-front, .flip-back {
+  box-sizing: border-box;   // add this
+}
+
+.flip-card {
+  width: min(350px, calc(100vw - 32px)); // replace width: 350px;
+}

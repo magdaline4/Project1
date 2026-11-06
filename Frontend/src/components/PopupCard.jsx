@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../assets/styles/PopupCard.scss";
 import Card from "../assets/images/1.jpg"
 
-const PopupCard = ({ showPopup, onClose }) => {
+  const PopupCard = ({ showPopup, onClose }) => {
   const [flipped, setFlipped] = useState(false);
   const [showQuestion, setShowQuestion] = useState(false);
   const [topHearts, setTopHearts] = useState([]);

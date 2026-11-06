@@ -2,59 +2,58 @@ import React, { useState, useEffect } from "react";
 import "../assets/styles/FullscreenGallery.scss";
 import Quiz from "../components/Quiz";
 
+const MOBILE_QUERY = "(max-width: 768px)";
+const SLIDE_INTERVAL = 1700; // ms between photos on phone — raise to 3000 for 3s
+
 export default function FullscreenGallery() {
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(null); // fullscreen overlay
+  const [slideIndex, setSlideIndex] = useState(0);      // phone slideshow
+  const [isMobile, setIsMobile] = useState(
+    () => window.matchMedia(MOBILE_QUERY).matches
+  );
   const [floatingHeart, setFloatingHeart] = useState([]);
-  
-  const [hearts, setHearts] = useState([]); // for romantic button
+
   const photos = Array.from({ length: 20 }, (_, i) => `/images/${i + 1}.jpg`);
 
-
-  // Generate hearts periodically
+  // Switch between phone slideshow and desktop grid
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newHeart = {
-        id: Date.now(),  
-        left: Math.random() * 100, // horizontal position %
-        size: 10 + Math.random() * 20, // size px
-        duration: 4 + Math.random() * 3 // float duration in seconds
-      };
-      setHearts((prev) => [...prev, newHeart]);
-      // Remove heart after animation
-      setTimeout(() => {
-        setHearts((prev) => prev.filter((h) => h.id !== newHeart.id));
-      }, newHeart.duration * 1000);
-    }, 500); // generate a new heart every 0.5s
-
-    return () => clearInterval(interval);
+    const mq = window.matchMedia(MOBILE_QUERY);
+    const handleChange = (e) => {
+      setIsMobile(e.matches);
+      setActiveIndex(null); // close overlay when the layout flips
+    };
+    mq.addEventListener("change", handleChange);
+    return () => mq.removeEventListener("change", handleChange);
   }, []);
 
-  const handlePhotoClick = (index) => {
-    setActiveIndex(index);
-  };
-
-  const handleCloseFullscreen = () => {
-    setActiveIndex(null);
-  };
-
+  // Phone only: one photo at a time, advance every SLIDE_INTERVAL
   useEffect(() => {
-    const generateFloatingHearts = () => {
-      const hearts = Array.from({ length: 20 }).map(() => ({
+    if (!isMobile || activeIndex !== null) return; // pause while fullscreen is open
+    const id = setInterval(() => {
+      setSlideIndex((i) => (i + 1) % photos.length);
+    }, SLIDE_INTERVAL);
+    return () => clearInterval(id);
+  }, [isMobile, activeIndex, photos.length]);
+
+  // Floating background hearts
+  useEffect(() => {
+    setFloatingHeart(
+      Array.from({ length: 20 }).map(() => ({
         id: Math.random(),
         left: Math.random() * 100,
         delay: Math.random() * 20,
         duration: 15 + Math.random() * 10,
         size: 20 + Math.random() * 30,
-        opacity: 0.3 + Math.random() * 0.5
-      }));
-      setFloatingHeart(hearts);
-    };
-
-    generateFloatingHearts();
+        opacity: 0.3 + Math.random() * 0.5,
+      }))
+    );
   }, []);
 
+  const handlePhotoClick = (index) => setActiveIndex(index);
+  const handleCloseFullscreen = () => setActiveIndex(null);
+
   return (
-    <div className="photo-gallery">
+    <div className={`photo-gallery${isMobile ? " is-mobile" : ""}`}>
       {/* Floating background hearts */}
       {floatingHeart.map((heart) => (
         <div
@@ -65,35 +64,57 @@ export default function FullscreenGallery() {
             animationDelay: `${heart.delay}s`,
             animationDuration: `${heart.duration}s`,
             fontSize: `${heart.size}px`,
-            opacity: heart.opacity
+            opacity: heart.opacity,
           }}
         >
           ❤
         </div>
       ))}
-      
-      {/* Photo grid */}
-      {photos.map((photo, index) => (
-        <div
-          key={index}
-          className={`photo-wrapper ${activeIndex === index ? "active" : ""}`}
-          onClick={() => handlePhotoClick(index)}
-        >
-          <img src={photo} alt={`Gallery ${index}`} className="photo" />
-        </div>
-      ))}
-      
-      {/* Fullscreen overlay when photo is clicked */}
-      {activeIndex !== null && (
-      <div className="fullscreen-overlay" onClick={handleCloseFullscreen}>
-  <div className="fullscreen-content">
-    <img src={photos[activeIndex]} className="fullscreen-photo" />
-    <button className="close-button" onClick={handleCloseFullscreen}>×</button>
-  </div>
-</div>
 
+      {isMobile ? (
+        /* Phone: single auto-advancing photo */
+        <div className="photo-slider">
+          <div
+            key={slideIndex} /* remount -> re-runs the slide animation */
+            className="photo-wrapper slide"
+            onClick={() => handlePhotoClick(slideIndex)}
+          >
+            <img
+              src={photos[slideIndex]}
+              alt={`Gallery ${slideIndex}`}
+              className="photo"
+            />
+          </div>
+        </div>
+      ) : (
+        /* Desktop: normal grid */
+        photos.map((photo, index) => (
+          <div
+            key={index}
+            className={`photo-wrapper ${activeIndex === index ? "active" : ""}`}
+            onClick={() => handlePhotoClick(index)}
+          >
+            <img src={photo} alt={`Gallery ${index}`} className="photo" />
+          </div>
+        ))
       )}
-      
+
+      {/* Fullscreen overlay */}
+      {activeIndex !== null && (
+        <div className="fullscreen-overlay" onClick={handleCloseFullscreen}>
+          <div className="fullscreen-content">
+            <img
+              src={photos[activeIndex]}
+              alt={`Gallery ${activeIndex}`}
+              className="fullscreen-photo"
+            />
+            <button className="close-button" onClick={handleCloseFullscreen}>
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
       <Quiz />
     </div>
   );
